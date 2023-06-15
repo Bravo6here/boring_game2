@@ -23,7 +23,7 @@ stcoinspeed = 10
 life = 5
 is_y = False
 is_ai = False
-
+was_there = False
 
 while lets_continue:
     for event in pygame.event.get():
@@ -40,7 +40,12 @@ while lets_continue:
                 is_y = False
             else:
                 is_ai = True
-    stimg_rect.centerx -= stcoinspeed
+    if stimg_rect.midleft[0] - stcoinspeed <= 0 and was_there == False:
+        stimg_rect.centerx = 20
+        was_there = True
+    else:
+        stimg_rect.centerx -= stcoinspeed
+        was_there = False
 
     if is_ai == True and is_y == False:
         
