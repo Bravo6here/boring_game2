@@ -1,6 +1,6 @@
 import pygame
 import random
-
+import time
 pygame.init()
 width = 600
 height = 300
@@ -15,10 +15,14 @@ hit = pygame.mixer.Sound(R"C:\Users\Jan - Hall 3000\Desktop\Pythonus\Pygame\bori
 lets_continue = True
 plimg = pygame.image.load(R"C:\Users\Jan - Hall 3000\Desktop\Pythonus\Pygame\boring_game2\man.png")
 plimg_rect = plimg.get_rect()
-plimg_rect.center = (width / 2, height / 2)
+plimg_rect.center = (width / 15, height / 2)
 stimg = pygame.image.load(R"C:\Users\Jan - Hall 3000\Desktop\Pythonus\Pygame\boring_game2\star.png")
 stimg_rect = stimg.get_rect()
-stimg_rect.center = (width // 2 - 100, height // 2)
+stimg_rect.center = (width // 0.5, height // 2)
+stcoinspeed = 10
+life = 5
+is_y = False
+is_ai = False
 
 
 while lets_continue:
@@ -30,25 +34,45 @@ while lets_continue:
         plimg_rect.centery -= 10
     elif (key[pygame.K_DOWN] or key[pygame.K_s]) and plimg_rect.centery < height - 40:
         plimg_rect.centery += 10
-    elif (key[pygame.K_LEFT] or key[pygame.K_a]) and plimg_rect.centerx > 20:
-        plimg_rect.centerx -= 10
-    elif (key[pygame.K_RIGHT] or key[pygame.K_d]) and plimg_rect.centerx < width - 30:
-        plimg_rect.centerx += 10
+    elif key[pygame.K_q]:
+            if is_ai == True:
+                is_ai = False
+                is_y = False
+            else:
+                is_ai = True
+    stimg_rect.centerx -= stcoinspeed
 
-    if plimg_rect.colliderect(stimg_rect):
-        continue_coll_func = True
-        while continue_coll_func:
-            stimg_rect.x = random.randrange(30, 580, 10)
-            stimg_rect.y = random.randrange(80, 280, 10)
-            if abs(stimg_rect.centerx - plimg_rect.centerx) > 30 and abs(stimg_rect.centery - plimg_rect.centery) > 30:
-                continue_coll_func = False        
+    if is_ai == True and is_y == False:
+        
+        if plimg_rect.centery > stimg_rect.centery + 10:
+            plimg_rect.centery -= 10
+        elif plimg_rect.centery < stimg_rect.centery - 10:
+            plimg_rect.centery += 10
+        else:
+            is_y = True
+
+    if plimg_rect.colliderect(stimg_rect): 
+        stimg_rect.x = width // 0.9
+        stimg_rect.y = random.randrange(80, 280, 10)
         score += 1
         collision.play()
+        stcoinspeed += 1
+        is_y = False
+
+    if stimg_rect.midleft[0] <= 0:
+        stimg_rect.x = width // 0.9
+        stimg_rect.y = random.randrange(80, 280, 10)
+        life -= 1
+        hit.play()
+        is_y = False
+    if life <= 0:
+        time.sleep(3)
+        lets_continue = False
 
     screen.fill((0, 0, 0))
     pygame.draw.line(screen, (255, 255, 255), (0, 50), (width, 50))
     font = pygame.font.SysFont("impact", 20)
-    text = font.render(f"Score: {score}", True, (255, 255, 255))
+    text = font.render(f"Score: {score} Lives: {life}", True, (255, 255, 255))
     text_rect = text.get_rect()
     text_rect.centerx = width // 2
     text_rect.centery = 25
